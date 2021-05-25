@@ -8,8 +8,27 @@ class PhoneCompanySpec extends AnyFreeSpec with Matchers {
     
     val pns = new PhoneCompany
 
+    "runner" - {
+
+        "if there are bad rows then show them all" in {
+           pns.runner("bad.log") shouldBe 
+            Error(
+                List(
+                    (7, InvalidRecord("Too few space delimited columns")),
+                    (9, InvalidRecord("Too many space delimited columns")),
+                )
+            )
+        }
+
+        "can calculate the bill" in {
+           pns.runner("calls.log") shouldBe 
+            Bill(Map("A" -> HundrethOfAPence(3138), "B" -> HundrethOfAPence(3008)))
+        }
+
+    }
+
     "readFile" - {
-        "Can parse call logs file" in {
+        "Can parse call logs file (filter empty lines)" in {
 
             val read = pns.readFile("calls.log") 
         
@@ -17,7 +36,7 @@ class PhoneCompanySpec extends AnyFreeSpec with Matchers {
                 "A 555-333-212 00:02:03",
                 "A 555-433-242 00:06:41"
             )
-            read.length shouldBe 15
+            read.length shouldBe 14
 
         }
     }

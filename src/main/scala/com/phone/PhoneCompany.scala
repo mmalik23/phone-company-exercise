@@ -4,6 +4,12 @@ import scala.concurrent.duration._
 import java.time.LocalTime
 import scala.util.{ Try, Failure, Success }
 
+case class Charge(customerId: String, charge: HundrethOfAPence)
+
+sealed trait Result
+case class Bill(content: Map[String, HundrethOfAPence]) extends Result
+case class Error(issues: List[(Int, InvalidRecord)]) extends Result
+
 case class Record(customerId: String, number: String, durations: FiniteDuration)
 case class HundrethOfAPence(value: Long) {
     def add(second: HundrethOfAPence) = HundrethOfAPence(second.value + value)
@@ -12,7 +18,16 @@ case class HundrethOfAPence(value: Long) {
 final case class InvalidRecord(msg: String) extends Throwable
 class PhoneCompany {
 
-    def readFile(resource: String): List[String] = scala.io.Source.fromResource(resource).getLines().toList
+    def runner(resource: String): Result = {
+        val records = readFile(resource).map(parseRawLog)
+        if (records.exists(_.isLeft)) {
+            Error(records.zipWithIndex.collect( { case (Left(v), row) => (row + 1, v)}))
+        } else {
+            Bill(calculateCostPerCustomer(records.collect( { case Right(value) => value})))
+        }
+    }
+
+    def readFile(resource: String): List[String] = scala.io.Source.fromResource(resource).getLines().toList.filterNot(_ == "")
 
     def parseRawLog(record: String): Either[InvalidRecord, Record] = {
 
