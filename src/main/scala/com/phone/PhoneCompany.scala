@@ -38,22 +38,25 @@ class PhoneCompany {
     )
    }
 
-   def calculateCostPerCustomer(records: List[Record]): Map[String, HundrethOfAPence] = records
-    .groupBy(_.customerId)
-    .view
-    .mapValues(records => 
-        records
-            .groupBy(_.number)
-            .values
-            .map(recordsByNumberCalled => 
-                recordsByNumberCalled.map( r => durationToCharge(r.durations))
+   def calculateCostPerCustomer(records: List[Record]): Map[String, HundrethOfAPence] = {
+    
+    def sum(records: Seq[HundrethOfAPence]) =  records.fold(HundrethOfAPence(0))(_.add(_))
+       
+    records
+        .groupBy(_.customerId)
+        .view
+        .mapValues(records => sum(
+            records
+                .groupBy(_.number)
+                .values
+                .map(recordsByNumberCalled => 
+                    sum(recordsByNumberCalled.map( r => durationToCharge(r.durations))
+                ))
                 .toVector
-                .fold(HundrethOfAPence(0))(_.add(_))   
-             )
-            .toList
-            .sortBy(_.value)
-            .dropRight(1)
-            .fold(HundrethOfAPence(0))(_.add(_))   
-  
-    ).toMap
+                .sortBy(_.value)
+                .dropRight(1)
+                )
+        )
+        .toMap
+   }
 }
