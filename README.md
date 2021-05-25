@@ -12,5 +12,5 @@ Write a program that when run will parse the `calls.log` file and print out the 
 
 ## Run
 
-To run app for call logs provided `sbt run`
-To run app for a different set of call logs then add the log file to `src/main/resouces` and run `sbt "run <name_of_file>"
+* To run app for call logs provided `sbt run`
+* To run app for a different set of call logs add the log file to `src/main/resouces` and run `sbt "run <name_of_file>"`
