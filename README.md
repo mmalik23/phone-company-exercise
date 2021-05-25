@@ -10,3 +10,7 @@ For a customer the cost of a call up to and including 3 minutes in duration is c
 
 Write a program that when run will parse the `calls.log` file and print out the total cost of calls for the day for each customer. You can use any libraries you wish to.
 
+## Run
+
+To run app for call logs provided `sbt run`
+To run app for a different set of call logs then add the log file to `src/main/resouces` and run `sbt "run <name_of_file>"
