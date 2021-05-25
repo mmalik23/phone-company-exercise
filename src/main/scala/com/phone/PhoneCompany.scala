@@ -5,7 +5,9 @@ import java.time.LocalTime
 import scala.util.{ Try, Failure, Success }
 
 case class Record(customerId: String, number: String, durations: FiniteDuration)
-case class HundrethOfAPence(value: Long)
+case class HundrethOfAPence(value: Long) {
+    def add(second: HundrethOfAPence) = HundrethOfAPence(second.value + value)
+}
 
 final case class InvalidRecord(msg: String) extends Throwable
 class PhoneCompany {
@@ -36,4 +38,22 @@ class PhoneCompany {
     )
    }
 
+   def calculateCostPerCustomer(records: List[Record]): Map[String, HundrethOfAPence] = records
+    .groupBy(_.customerId)
+    .view
+    .mapValues(records => 
+        records
+            .groupBy(_.number)
+            .values
+            .map(recordsByNumberCalled => 
+                recordsByNumberCalled.map( r => durationToCharge(r.durations))
+                .toVector
+                .fold(HundrethOfAPence(0))(_.add(_))   
+             )
+            .toList
+            .sortBy(_.value)
+            .dropRight(1)
+            .fold(HundrethOfAPence(0))(_.add(_))   
+  
+    ).toMap
 }

@@ -54,4 +54,46 @@ class PhoneCompanySpec extends AnyFreeSpec with Matchers {
             pns.durationToCharge(0.seconds) shouldBe HundrethOfAPence(0)
         }
     }
+
+    "calculateCustomerStatistics" - {
+
+        val bob = "bob"
+
+        val wendy = "wendy"
+        val lauren = "lauren"
+
+        "If there is only one record then the cost is zero because of promotion" in {
+            pns.calculateCostPerCustomer(List(
+                Record(bob, wendy, 1.minutes)
+            )) shouldBe Map(bob -> HundrethOfAPence(0))
+        }
+
+        "If there are two records for the same number then the cost is zero" in {
+            pns.calculateCostPerCustomer(List(
+                Record(bob, wendy, 1.minutes),
+                Record(bob, wendy, 1.minutes)
+            )) shouldBe Map(bob -> HundrethOfAPence(0))
+        }
+
+        "If there are calls to multiple numbers remove the one which cost the most" in {
+            val firstCall = 3.minutes
+            val secondCall = 2.seconds
+            val thirdCall =  firstCall.plus(3.second)
+            pns.calculateCostPerCustomer(List(
+                Record(bob, wendy, firstCall),
+                Record(bob, wendy, secondCall),
+                Record(bob, lauren, firstCall.plus(3.second)),
+            )) shouldBe Map(bob -> HundrethOfAPence(909))
+        }
+
+        "Finds the total for each customer" in {
+            pns.calculateCostPerCustomer(List(
+                Record(bob, wendy, 5.second),
+                Record(bob, lauren, 2.second),
+                Record(lauren, wendy, 1.second),
+                Record(lauren, bob, 3.second),
+            )) shouldBe Map(bob -> HundrethOfAPence(10), lauren -> HundrethOfAPence(5))
+        }
+    }
+
 }
