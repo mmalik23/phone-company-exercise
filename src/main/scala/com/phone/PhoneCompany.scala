@@ -1,12 +1,12 @@
 package com.phone
 
-import java.time.Duration
+import scala.concurrent.duration._
 import java.time.LocalTime
 import scala.util.Try
 import scala.util.Failure
 import scala.util.Success
 
-case class Record(customerId: String, number: String, durations: Duration)
+case class Record(customerId: String, number: String, durations: FiniteDuration)
 
 final case class InvalidRecord(msg: String) extends Throwable
 class PhoneCompany {
@@ -19,7 +19,7 @@ class PhoneCompany {
             LocalTime.parse(duration)
         } match {
             case Failure(_) => Left(InvalidRecord(s"Invalid duration: $duration"))
-            case Success(time) => Right(Duration.ofSeconds(time.toSecondOfDay()))
+            case Success(time) => Right(time.toSecondOfDay().seconds)
         }
         
         record.split(" ") match {

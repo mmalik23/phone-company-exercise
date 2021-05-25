@@ -1,7 +1,7 @@
 import org.scalatest.freespec.AnyFreeSpec
 import com.phone.PhoneCompany
 import org.scalatest.matchers.should.Matchers
-import java.time.Duration
+import scala.concurrent.duration._
 import com.phone.Record
 import com.phone.InvalidRecord
 
@@ -26,7 +26,7 @@ class PhoneCompanySpec extends AnyFreeSpec with Matchers {
 
     "parseRawLog" - {
        "Can parse log record" in {
-            pns.parseRawLog("lol rofl 00:02:03") shouldBe Right(Record("lol", "rofl", Duration.ofSeconds(123)))
+            pns.parseRawLog("lol rofl 00:02:03") shouldBe Right(Record("lol", "rofl", 123.seconds))
         }
 
        "Fail if there are too many rows" in {
