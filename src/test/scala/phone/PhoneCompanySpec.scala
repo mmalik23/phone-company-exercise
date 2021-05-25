@@ -1,6 +1,9 @@
 import org.scalatest.funsuite.AnyFunSuite
 import com.phone.PhoneCompany
 import org.scalatest.matchers.should.Matchers
+import java.time.Duration
+import com.phone.Record
+import com.phone.InvalidRecord
 
 
 class PhoneCompanySpec extends AnyFunSuite with Matchers {
@@ -16,4 +19,22 @@ class PhoneCompanySpec extends AnyFunSuite with Matchers {
         )
         read.length shouldBe 15
     }
+
+    test("Can parse log record") {
+        pns.parseRawLog("lol rofl 00:02:03") shouldBe Right(Record("lol", "rofl", Duration.ofSeconds(123)))
+    }
+
+    test("Fail if there are too many rows") {
+        pns.parseRawLog("lol rofl 00:02:03 sd") shouldBe Left(InvalidRecord("Too many space delimited columns"))
+    }
+
+    test("Fail if there are too few rows") {
+        pns.parseRawLog("lol rofl") shouldBe Left(InvalidRecord("Too few space delimited columns"))
+        pns.parseRawLog("") shouldBe Left(InvalidRecord("Too few space delimited columns"))
+    }
+
+    test("If the time window cannot be parsed") {
+        pns.parseRawLog("lol rofl badduration") shouldBe Left(InvalidRecord("Invalid duration: badduration"))
+    }
+
 }
