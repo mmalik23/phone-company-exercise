@@ -1,9 +1,7 @@
 import org.scalatest.freespec.AnyFreeSpec
-import com.phone.PhoneCompany
 import org.scalatest.matchers.should.Matchers
 import scala.concurrent.duration._
-import com.phone.Record
-import com.phone.InvalidRecord
+import com.phone._
 
 
 class PhoneCompanySpec extends AnyFreeSpec with Matchers {
@@ -40,6 +38,20 @@ class PhoneCompanySpec extends AnyFreeSpec with Matchers {
 
        "If the time window cannot be parsed" in {
             pns.parseRawLog("lol rofl badduration") shouldBe Left(InvalidRecord("Invalid duration: badduration"))
+        }
+    }
+
+    "durationToCharge" - {
+        "If duration <= 3m charge is fixed 0.05p per pence " in {
+            pns.durationToCharge(3.minutes) shouldBe HundrethOfAPence(5 * 3 * 60)
+        }
+
+        "If duration > 3m charge is fixed 0.05p per pence for the first three minutes then 0.03p for rest " in {
+            pns.durationToCharge(3.minutes.plus(1.second)) shouldBe HundrethOfAPence(5 * 3 * 60 + 3)
+        }
+
+        "When the duration is zero return 0 price" in {
+            pns.durationToCharge(0.seconds) shouldBe HundrethOfAPence(0)
         }
     }
 }

@@ -2,11 +2,10 @@ package com.phone
 
 import scala.concurrent.duration._
 import java.time.LocalTime
-import scala.util.Try
-import scala.util.Failure
-import scala.util.Success
+import scala.util.{ Try, Failure, Success }
 
 case class Record(customerId: String, number: String, durations: FiniteDuration)
+case class HundrethOfAPence(value: Long)
 
 final case class InvalidRecord(msg: String) extends Throwable
 class PhoneCompany {
@@ -28,4 +27,13 @@ class PhoneCompany {
             case _ => Left(InvalidRecord("Too few space delimited columns"))
         }
     }
+
+   def durationToCharge(duration: FiniteDuration): HundrethOfAPence = {
+    val threeMinutes = 3.minutes
+    if (duration <= threeMinutes) HundrethOfAPence(duration.toSeconds * 5)
+    else HundrethOfAPence(
+        threeMinutes.toSeconds * 5 + duration.minus(threeMinutes).toSeconds * 3
+    )
+   }
+
 }
