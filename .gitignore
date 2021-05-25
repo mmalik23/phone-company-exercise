@@ -3,3 +3,12 @@ target
 project/target
 project/project
 
+# Metals and bloop   
+.bloop/
+.metals/
+project/.bloop/
+project/metals.sbt
+project/project/
+
+#VScode
+.vscode/
