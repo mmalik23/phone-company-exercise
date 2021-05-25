@@ -55,7 +55,7 @@ class PhoneCompanySpec extends AnyFreeSpec with Matchers {
         }
     }
 
-    "calculateCustomerStatistics" - {
+    "calculateCostPerCustomer" - {
 
         val bob = "bob"
 
@@ -84,6 +84,14 @@ class PhoneCompanySpec extends AnyFreeSpec with Matchers {
                 Record(bob, wendy, secondCall),
                 Record(bob, lauren, firstCall.plus(3.second)),
             )) shouldBe Map(bob -> HundrethOfAPence(909))
+        }
+
+        "If a customer has two numbers the same amount of time, take one of them out of the calculation" in {
+            val call = 3.minutes
+            pns.calculateCostPerCustomer(List(
+                Record(bob, lauren, call),
+                Record(bob, wendy, call)
+            )) shouldBe Map(bob -> HundrethOfAPence(900))
         }
 
         "Finds the total for each customer" in {
